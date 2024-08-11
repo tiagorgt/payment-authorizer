@@ -1,0 +1,52 @@
+@startuml
+
+title Concurrent Sequence Diagram: An event-driven architecture using Kafka will ensure that all transactions for the same account are processed in order.
+
+actor Client
+participant "TransactionService" as TS
+participant "KafkaProducerService" as KPS
+participant "KafkaConsumerService" as KCS
+participant "AccountRepository" as AR
+participant "TransactionRepository" as TR
+
+Client -> TS: POST /transactions
+TS -> TS: generateTransactionId()
+TS -> AR: findByAccountId(transaction.getAccountId())
+alt Account not found
+    TS --> Client: "07" (Account not found)
+else Account found
+    TS -> KPS: sendTransaction(transaction) 
+    note right: A new kafka event is sent\nto Kafka topic "transactions" \nwith the transaction details\nand account id as key.\nThis will ensure that all\ntransactions for the same account\nare processed in order.
+    TS --> Client: transactionId
+end
+
+KCS -> KCS: consumeTransaction(transaction)
+note right: Consumes the transaction event\nfrom Kafka topic "transactions"\n and processes it
+KCS -> AR: findByAccountId(transaction.getAccountId())
+AR --> KCS: Account
+
+KCS -> KCS: getMccByMerchant(transaction.getMerchant())
+KCS -> KCS: getBalanceByMcc(account, mcc)
+
+alt Balance sufficient
+    KCS -> KCS: updateBalance(account, mcc, newBalance)
+    KCS -> TR: save(transaction)
+    KCS -> KPS: sendTransactionResult(transactionId, "00" (Approved))
+    note right: Sends a new kafka event to\nKafka topic "transaction-results"\nwith the transaction result
+else Balance insufficient
+    alt Cash balance sufficient
+        KCS -> KCS: updateCashBalance(newBalance)
+        KCS -> AR: save(account)
+        KCS -> TR: save(transaction)
+        KCS -> KPS: sendTransactionResult(transactionId, "00" (Approved using CASH balance))
+        note right: Sends a new kafka event to\nKafka topic "transaction-results"\nwith the transaction result
+    else Cash balance insufficient
+        KCS -> KPS: sendTransactionResult(transactionId, "51" (Insufficient funds))
+        note right: Sends a new kafka event to\nKafka topic "transaction-results"\nwith the transaction result
+    end
+end
+
+Client -> KCS: listen for transaction result
+KCS --> Client: transaction result (success or failure)
+note left: The client listens for the transaction\nresult from Kafka topic "transaction-results"\nby transactionId
+@enduml
