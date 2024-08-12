@@ -8,7 +8,7 @@ This project implements a payment authorizer REST API using Spring Boot and Post
 - **Docker**: Docker should be installed to run an instance of PostgreSQL.
 - **Maven**: Maven should be installed to build the project.
 
-## How to Run
+## Running the Application
 
 1. **Start the PostgreSQL database using docker compose**:
     ```bash
@@ -23,6 +23,7 @@ This project implements a payment authorizer REST API using Spring Boot and Post
 ### Accessing the Application
 
 - The application will be accessible at `http://localhost:8080`.
+- The API Documentation will be accessible at `http://localhost:8080/swagger-ui.html`
 
 ### Authorizing a Transaction
 
