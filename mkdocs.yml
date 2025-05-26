@@ -1,0 +1,8 @@
+site_name: 'payment-authorizer'
+
+nav:
+  - Home: index.md
+  - Authorization Diagram: authorization-diagram.md
+
+plugins:
+  - techdocs-core
