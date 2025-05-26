@@ -3,3 +3,8 @@ kind: Component
 metadata:
   name: payment-authorizer
   description: Payment Authorizer
+spec:
+  type: website
+  owner: john@example.com
+  lifecycle: experimental
+
