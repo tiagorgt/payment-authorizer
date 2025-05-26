@@ -3,10 +3,10 @@ kind: Component
 metadata:
   name: payment-authorizer
   description: Payment Authorizer
+  annotations:
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: website
   owner: john@example.com
   lifecycle: experimental
-annotations:
-  backstage.io/techdocs-ref: dir:.
 
