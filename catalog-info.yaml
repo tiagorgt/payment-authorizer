@@ -7,4 +7,6 @@ spec:
   type: website
   owner: john@example.com
   lifecycle: experimental
+annotations:
+  backstage.io/techdocs-ref: dir:.
 
